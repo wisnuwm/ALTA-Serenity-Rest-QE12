@@ -1,14 +1,18 @@
 package starter.stepdef;
 
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.module.jsv.JsonSchemaValidator;
 import net.serenitybdd.rest.SerenityRest;
 import net.thucydides.core.annotations.Steps;
 import starter.reqres.ReqresAPI;
+import starter.reqres.ReqresResponses;
 import starter.utils.Constants;
 
 import java.io.File;
+import static org.hamcrest.Matchers.equalTo;
 
 public class ReqresStepDef {
     @Steps
@@ -31,6 +35,21 @@ public class ReqresStepDef {
         SerenityRest.then().statusCode(ok);
     }
 
+    @And("Response body page should be {int}")
+    public void responseBodyPageShouldBePage(int page) {
+
+        SerenityRest.then()
+                .body(ReqresResponses.PAGE,equalTo(page));
+    }
+
+    @And("Validate get list users JSON schema {string}")
+    public void validateGetListUsersJSONSchema(String jsonFile) {
+        File json = new File(Constants.JSON_SCHEMA+jsonFile);
+        SerenityRest.and()
+                .assertThat()
+                .body(JsonSchemaValidator.matchesJsonSchema(json));
+    }
+
     //Scenario 2 : post create new user
     @Given("Create new user with valid json {string}")
     public void createNewUserWithValidJson(String jsonFile) {
@@ -46,6 +65,21 @@ public class ReqresStepDef {
     @Then("Status code should be {int} Created")
     public void statusCodeShouldBeCreated(int created) {
         SerenityRest.then().statusCode(created);
+    }
+
+    @And("Response body name was {string} and job was {string}")
+    public void responseBodyNameWasAndJobWas(String name, String job) {
+        SerenityRest.and()
+                .body(ReqresResponses.NAME,equalTo(name))
+                .body(ReqresResponses.JOB, equalTo(job));
+    }
+
+    @And("Validate create a new user JSON schema {string}")
+    public void validateCreateANewUserJSONSchema(String jsonFile) {
+        File json = new File(Constants.JSON_SCHEMA+jsonFile);
+        SerenityRest.then()
+                .assertThat()
+                .body(JsonSchemaValidator.matchesJsonSchema(json));
     }
 
     //Scenario 3: Put update user
